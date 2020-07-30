@@ -17,7 +17,7 @@ public class KDTree {
     }
 
     private KDNode add(KDNode node, Point other, boolean leftRight) {
-        if (node == null) { return new KDNode(other); } // makes a new KDTree if empty
+        if (node == null) { return new KDNode(other); } // inserts a new node at each leaf node
 
         if (leftRight) { // split vertically
             if (node.point.x > other.x) { // add to left branch
@@ -44,6 +44,10 @@ public class KDTree {
         return points;
     }
 
+    /**
+     * Helper method to find the nearest points. Traverses the objectively best branch first before exploring branches
+     * that may contain points that are within n distance.
+     */
     private void nearestNode(KDNode node, Point p, List<Point> points, int distance, boolean leftRight) {
         if (node == null) {
             return;
