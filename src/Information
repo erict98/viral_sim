@@ -1,0 +1,42 @@
+Programming:
+
+The goal of this project is to provide educational materials on the spread of viruses due to the prevalence of COVID-19
+and the spread of misinformation. This simulation will show the virus can spread when precautions are ignored and the
+consequences on the general population as well as at-risk populations.
+
+Initial project will incorporate basic factors (ignores race, age, and other influential factors). The simulation will
+consist of points that represents individuals that will move around and interact with other points. An infected point
+will have a chance to spread the infection (ignoring if they are symptomatic for now).
+
+Before implementing the simulation, do some research and the spread of the virus to accurately reflect the real-world situation.
+Do not worry about the GUI-implementation.
+
+kdtree.Point class:
+ - Represents an individual (can represents group in the future)
+ - - Individuals cannot occupy the same coordinates
+ - Since there will be many points and have to search, use a graph that updates the distance? with a priority queue
+ - - Need a way to keep track of the distance between points and be able to update them as the points move around
+
+ - A point can be masked (reduces the chance of spreading or getting the virus)
+ - A point can be infected (infected points cannot receive the virus again until they have been cleared)
+ - - Incubation period if 5 - 6 days, ranging from 3 to 13 days before showing symptoms
+ - - - Being immunocompromised does not mean increased probability of getting infected, but means that death if higher
+ - - Re-infection can occur
+ - - Can be asymptomatic (no documented asymptomatic transmission)
+
+Temp: do not keep track of homes or families (yet)
+Every tick, the simulation will update and the point will move by zero or one unit
+- Use a PQ to keep track of the future destination of the point since they cannot occupy the same spots
+- Every tick, symptomatic individuals will have chance to "sneeze" and spread the infection
+- - Tick is 1 second and represents 1 day (for now)
+- - individuals within 6 units will have a chance of becoming infected (more research)
+
+Global position chart that keeps track of current points positions
+Updated position chart that keeps track of future points positions
+After each point moves, use a PQ to keep track of the closest points
+- - If infected point sneezes, everyone in the PQ that are within 6 units can be infected
+- - Future update, only add points that are nearby
+
+Infected points have small probability of becoming severely infected and high probability to die
+
+When updating the current positions, use a PQ and give priority to points that need to be updated to avoid edge case
