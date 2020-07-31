@@ -52,7 +52,7 @@ public class Point {
     }
 
     /**
-     * Returns the distance between two points.
+     * Returns the distance between this point and other point.
      */
     public double distance(Point other) {
         double distX = Math.pow(other.x - this.x, 2);
@@ -103,7 +103,7 @@ public class Point {
      * @param updatedPositions contains the list of points and their future position.
      */
     private void move(int[][] updatedPositions) {
-        if (!alive) {
+        if (!alive) { //Temporarily moves the point to (-1, -1) until it can be removed fully
             updatedPositions[this.id][0] = -1;
             updatedPositions[this.id][1] = -1;
             return;

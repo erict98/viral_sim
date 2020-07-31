@@ -3,7 +3,7 @@ package kdtree;
 import java.util.LinkedList;
 import java.util.List;
 
-public class KDTree {
+public class KDTree implements PointSet {
     private KDNode root;
 
     /**
@@ -80,15 +80,11 @@ public class KDTree {
         }
 
         nearestNode(search, p, points, distance, !leftRight); // Automatically searches the objectively best branch
-        if (leftRight && p.distance(new Point(q.x, p.y)) <= distance) { // Checks if the horizontal partition has potential
+        if (leftRight && p.distance(new Point(-1, q.x, p.y)) <= distance) { // Checks if the horizontal partition has potential
             nearestNode(potential, p, points, distance, false);
-        } else if (!leftRight && p.distance(new Point(p.x, q.y)) <= distance) { // Checks if the vertical partition has potential
+        } else if (!leftRight && p.distance(new Point(-1, p.x, q.y)) <= distance) { // Checks if the vertical partition has potential
             nearestNode(potential, p, points, distance, true);
         }
-    }
-
-    public Point remove() {
-        //TODO
     }
 
 static class KDNode {
