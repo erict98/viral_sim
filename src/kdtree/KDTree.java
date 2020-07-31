@@ -56,7 +56,7 @@ public class KDTree {
         KDNode potential; // Search other branch if it may contain points that are within 6 units
 
         Point q = node.point;
-        if (p.distance(q) <= distance) {
+        if (p.distance(q) <= distance && p.id != q.id) { // Cannot add to list if the same point
             points.add(q);
         }
 
@@ -85,6 +85,10 @@ public class KDTree {
         } else if (!leftRight && p.distance(new Point(p.x, q.y)) <= distance) { // Checks if the vertical partition has potential
             nearestNode(potential, p, points, distance, true);
         }
+    }
+
+    public Point remove() {
+        //TODO
     }
 
 static class KDNode {

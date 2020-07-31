@@ -11,8 +11,7 @@ public class Bookkeeper {
     Point[] cluster; // index represents unique id
 
     /**
-     * Keeps track of the points in this simulation. Each point will be given an unique id
-     * -1 represents dead
+     * Keeps track of the points in this simulation. Each point will be given an unique id.
      * @param points
      */
     public Bookkeeper(int points) {

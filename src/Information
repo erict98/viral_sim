@@ -19,7 +19,7 @@ kdtree.Point class:
 
  - A point can be masked (reduces the chance of spreading or getting the virus)
  - A point can be infected (infected points cannot receive the virus again until they have been cleared)
- - - Incubation period if 5 - 6 days, ranging from 3 to 13 days before showing symptoms
+ - - Incubation period of 5 - 6 days, ranging from 3 to 13 days before showing symptoms
  - - - Being immunocompromised does not mean increased probability of getting infected, but means that death if higher
  - - Re-infection can occur
  - - Can be asymptomatic (no documented asymptomatic transmission)
@@ -40,3 +40,5 @@ After each point moves, use a PQ to keep track of the closest points
 Infected points have small probability of becoming severely infected and high probability to die
 
 When updating the current positions, use a PQ and give priority to points that need to be updated to avoid edge case
+
+Takes 3 -
