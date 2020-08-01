@@ -11,25 +11,32 @@ public class KDTree implements PointSet {
      *
      */
     public KDTree(List<Point> points) {
+        /*
+        Loop invariant:
+        left branch (p.x <= q.x), right branch (p.x > q.x)
+        down branch (p.y <= q.y), up branch (p.y > q.y)
+         */
         for (Point point : points) {
            root = add(root, point, true);
         }
     }
 
-    private KDNode add(KDNode node, Point other, boolean leftRight) {
-        if (node == null) { return new KDNode(other); } // inserts a new node at each leaf node
+    private KDNode add(KDNode node, Point p, boolean leftRight) {
+        if (node == null) { return new KDNode(p); } // inserts a new node at each leaf node
+
+        Point q = node.point;
 
         if (leftRight) { // split vertically
-            if (node.point.x > other.x) { // add to left branch
-                node.left = add(node.left, other, false);
+            if (p.x <= q.x) { // add to left branch
+                node.left = add(node.left, p, false);
             } else { // add to the right branch
-                node.right = add(node.right, other, false);
+                node.right = add(node.right, p, false);
             }
         } else { // split horizontally
-            if (node.point.y > other.y) { // add to the down branch
-                node.down = add(node.down, other, true);
+            if (p.y <= q.y) { // add to the down branch
+                node.down = add(node.down, p, true);
             } else { // add to the up branch
-                node.up = add(node.up, other, true);
+                node.up = add(node.up, p, true);
             }
         }
         return node;
@@ -62,7 +69,7 @@ public class KDTree implements PointSet {
 
         // Establishes which branch is objectively the best choice and which branch has potential
         if (leftRight) { // Compare along the x-coordinates
-            if (p.x < q.x) { // Search the left subtree
+            if (p.x <= q.x) { // Search the left subtree
                 search = node.left;
                 potential = node.right;
             } else { // Search the right subtree
@@ -70,7 +77,7 @@ public class KDTree implements PointSet {
                 potential = node.left;
             }
         } else { // Compare along the y-coordinates
-            if (p.y < q.y) { // Search the down subtree
+            if (p.y <= q.y) { // Search the down subtree
                 search = node.down;
                 potential = node.up;
             } else { // Search the up subtree

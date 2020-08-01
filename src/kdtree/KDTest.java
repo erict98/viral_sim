@@ -1,5 +1,6 @@
 package kdtree;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class KDTest {
 
     public KDTest() {
         cluster = new LinkedList<>();
-        for (int i = 0; i < 20000; i++) {
+        for (int i = 0; i < 5; i++) {
             cluster.add(new Point(i, rand.nextInt(100), rand.nextInt(100)));
         }
         kdtree = new KDTree(cluster);
@@ -70,6 +71,38 @@ public class KDTest {
             arrayID.add(point.id);
         }
         Collections.sort(arrayID);
+
         assertEquals(treeID, arrayID);
+    }
+
+    @Test
+    public void nearestDifferentID() {
+        int size = cluster.size();
+        for (int i = 0; i < 5; i++) {
+            cluster.add(new Point(size + i, 6, 6));
+        }
+        Point test1 = cluster.get(cluster.size() - 1);
+        Point test2 = cluster.get(cluster.size() - 2);
+
+        kdtree = new KDTree(cluster);
+        kdarray = new KDArray(cluster);
+
+        List<Point> nearestTree = kdtree.nearest(test1, test1.distance);
+        List<Point> nearestArray = kdarray.nearest(test2, test2.distance);
+
+        List<Integer> treeID = new ArrayList<>();
+        List<Integer> arrayID = new ArrayList<>();
+
+        for (Point point : nearestTree) {
+            treeID.add(point.id);
+        }
+        Collections.sort(treeID);
+        for (Point point : nearestArray) {
+            arrayID.add(point.id);
+        }
+        Collections.sort(arrayID);
+
+        assertEquals(treeID.size(), arrayID.size());
+        assertNotEquals(treeID, arrayID);
     }
 }
