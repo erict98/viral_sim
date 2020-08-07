@@ -21,19 +21,23 @@ public class KDTree implements PointSet {
         }
     }
 
+    public KDTree() {
+        this(new LinkedList<Point>());
+    }
+
     private KDNode add(KDNode node, Point p, boolean leftRight) {
         if (node == null) { return new KDNode(p); } // inserts a new node at each leaf node
 
         Point q = node.point;
 
         if (leftRight) { // split vertically
-            if (p.x <= q.x) { // add to left branch
+            if (p.x() <= q.x()) { // add to left branch
                 node.left = add(node.left, p, false);
             } else { // add to the right branch
                 node.right = add(node.right, p, false);
             }
         } else { // split horizontally
-            if (p.y <= q.y) { // add to the down branch
+            if (p.y() <= q.y()) { // add to the down branch
                 node.down = add(node.down, p, true);
             } else { // add to the up branch
                 node.up = add(node.up, p, true);
@@ -63,13 +67,13 @@ public class KDTree implements PointSet {
         KDNode potential; // Search other branch if it may contain points that are within 6 units
 
         Point q = node.point;
-        if (p.distance(q) <= distance && p.id != q.id) { // Cannot add to list if the same point
+        if (p.distance(q) <= distance && p.id() != q.id()) { // Cannot add to list if the same point
             points.add(q);
         }
 
         // Establishes which branch is objectively the best choice and which branch has potential
         if (leftRight) { // Compare along the x-coordinates
-            if (p.x <= q.x) { // Search the left subtree
+            if (p.x() <= q.x()) { // Search the left subtree
                 search = node.left;
                 potential = node.right;
             } else { // Search the right subtree
@@ -77,7 +81,7 @@ public class KDTree implements PointSet {
                 potential = node.left;
             }
         } else { // Compare along the y-coordinates
-            if (p.y <= q.y) { // Search the down subtree
+            if (p.y() <= q.y()) { // Search the down subtree
                 search = node.down;
                 potential = node.up;
             } else { // Search the up subtree
@@ -87,10 +91,17 @@ public class KDTree implements PointSet {
         }
 
         nearestNode(search, p, points, distance, !leftRight); // Automatically searches the objectively best branch
-        if (leftRight && p.distance(new Point(-1, q.x, p.y)) <= distance) { // Checks if the horizontal partition has potential
+        if (leftRight && p.distance(new Point(q.x(), p.y())) <= distance) { // Checks horizontal partition
             nearestNode(potential, p, points, distance, false);
-        } else if (!leftRight && p.distance(new Point(-1, p.x, q.y)) <= distance) { // Checks if the vertical partition has potential
+        } else if (!leftRight && p.distance(new Point(p.x(), q.y())) <= distance) { // Checks vertical partition
             nearestNode(potential, p, points, distance, true);
+        }
+    }
+
+    public void reset(List<Point> points) {
+        root = null;
+        for (Point point : points) {
+            root = add(root, point, true);
         }
     }
 

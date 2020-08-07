@@ -9,9 +9,16 @@ import java.util.List;
 public class KDArray implements PointSet {
     private List<Point> root;
 
+    /**
+     * Makes a defensive copy
+     */
     public KDArray(List<Point> points) {
         root = new LinkedList<>();
         root.addAll(points);
+    }
+
+    public KDArray() {
+        this(new LinkedList<Point>());
     }
 
     /**
@@ -20,10 +27,15 @@ public class KDArray implements PointSet {
     public List<Point> nearest(Point p, int distance) {
         List<Point> nearest = new LinkedList<>();
         for (Point q : root) {
-            if (p.distance(q) <= distance && p.id != q.id) {
+            if (p.distance(q) <= distance && p.id() != q.id()) {
                 nearest.add(q);
             }
         }
         return nearest;
+    }
+
+    public void reset(List<Point> points) {
+        root = new LinkedList<>();
+        root.addAll(points);
     }
 }
