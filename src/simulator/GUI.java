@@ -4,27 +4,19 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.*;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import kdtree.Point;
 
-import java.sql.Time;
-import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
-
-import java.awt.print.Book;
-import java.util.List;
-
 public class GUI extends Application {
-    public final int HEIGHT = 768;
-    public final int WIDTH = 1024;
+    public final int HEIGHT = 500;
+    public final int WIDTH  = 500;
     public final int RADIUS = 3;
 
     private Bookkeeper bk;
@@ -36,9 +28,10 @@ public class GUI extends Application {
     /**
      * Border Pane (left - paint, right - menus)
      * UI - tick speed, pause, continue, restart, count
+     * Log that reports new upates
      *
-     * For each dot make a new class?
-     */
+     * Global time clock
+     * */
     @Override
     public void start(Stage stage) throws Exception {
         startUp();
@@ -48,30 +41,41 @@ public class GUI extends Application {
         stage.setMinHeight(HEIGHT);
 
         KeyFrame kf = new KeyFrame(Duration.ZERO, e -> refreshScene());
-        final Timeline timeline = new Timeline(kf, new KeyFrame(Duration.millis(1000)));
+        final Timeline timeline = new Timeline(kf, new KeyFrame(Duration.millis(500)));
         timeline.setCycleCount(Timeline.INDEFINITE);
 
-        stage.setScene(new Scene(new Group(circles), WIDTH, HEIGHT));
-        stage.show();
+        Pane pane = new Pane();
+        Button play = new Button("Play");
+        play.setOnAction(e -> {
+            timeline.play();
+            play.setDisable(true);
+        });
+        pane.getChildren().addAll(play, new Group(circles));
 
-        timeline.play();
+        stage.setScene(new Scene(pane, WIDTH, HEIGHT));
+        stage.show();
     }
 
     public void startUp() {
-        this.bk = new Bookkeeper(100, WIDTH, HEIGHT, "COVID19");
+        this.bk = new Bookkeeper(300, WIDTH, HEIGHT, "COVID19"); // Too much slows down the program
         this.points = bk.id();
         this.circles = new Circle[points.length];
 
         for (int i = 0; i < points.length; i++) {
-            int x = points[i].x();
-            int y = points[i].y();
-            circles[i] = new Circle(x, y, RADIUS);
+            Point p = points[i];
 
-            if (points[i].infected()) {
-                circles[i].setFill(Color.RED);
+            int x = p.x();
+            int y = p.y();
+
+            Circle c = new Circle(x, y, RADIUS);
+            if (!p.alive()) {
+                c.setFill(Color.BLACK);
+            } else if (p.infected()) {
+                c.setFill(Color.web("#ff6961"));
             } else {
-                circles[i].setFill(Color.BLUE);
+                c.setFill(Color.web("#68BBE3"));
             }
+            circles[i] = c;
         }
     }
 
@@ -84,12 +88,12 @@ public class GUI extends Application {
             c.setCenterX(p.x());
             c.setCenterY(p.y());
 
-            if (p.infected()) {
-                c.setFill(Color.RED);
-            } else if (!p.alive()) {
+            if (!p.alive()) {
                 c.setFill(Color.BLACK);
+            } else if (!p.infected()) {
+                c.setFill(Color.web("#68BBE3"));
             } else {
-                c.setFill(Color.BLUE);
+                c.setFill(Color.web("#ff6961"));
             }
         }
     }

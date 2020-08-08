@@ -12,14 +12,13 @@ public class Disease {
     String diseaseName;
     int distance;
 
-
     int incubationRange; // Represents the length of incubation period
     int infectiousRange; // Represents the length of infectious period
     int presymptomatic;  // Determines if infectious symptoms show
 
     double percentContagious; // Probability of showing symptoms
-    double percentDeath; // Probability of showing showing symptoms and dying
-    double probability = 1; //TODO
+    double percentDeath;      // Probability of showing showing symptoms and dying
+    double probability = 1;   //TODO
 
     Point point;
 

@@ -4,6 +4,7 @@ import kdtree.KDTree;
 import kdtree.Point;
 import kdtree.PointSet;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -12,13 +13,15 @@ import java.util.Random;
  * Responsible for generating and keeping track of all the points in the simulation
  */
 public class Bookkeeper {
-    public final int x;
-    public final int y;
-    private Point[] id;              // Index represents unique id
-    public final String diseaseName; // Disease
+    public  final int     x;
+    public  final int     y;
+    private final Point[] id; // Each index represents the unique id for any given Point
+    public  final String  diseaseName;
 
-    private List<Point> active;          // Keeps track of active points
-    private PointSet set = new KDTree(); // Stores the location of the active points
+    private final List<Point> active;             // Keeps track of active points
+    private final PointSet    set = new KDTree(); // Stores the location of the active point
+    private int               numberOfUpdates;    // Number of updates that have occurred for this simulation
+    private final int         nextDay = 6;        // Number of updates required for the next day to proceed
 
     Random rand = new Random();
 
@@ -44,40 +47,34 @@ public class Bookkeeper {
 
     public Point[] id() { return id; }
 
-    public List<Point> active() { return new LinkedList<Point>(active); }
-
     /**
      * Updates the list of currently active points and their list of nearby points.
      */
     public void updateSimulation() {
-        active = new LinkedList<>();
-        for (Point point : id) { // Updates the list of active points
-            if (point.alive()) {
-                active.add(point);
-            }
+        if (numberOfUpdates % nextDay == 0) {
+            id[0].updateDay();
         }
-        set.reset(active); // Resets the PointSet for all active points
 
-        for (Point point : id) { // Updates the list of nearest points for each point
-            if (point.alive()) {
-                point.update(set.nearest(point, point.distance()));
+        List<Point> infected = new LinkedList<>();
+        Iterator<Point> itr = active.iterator();
+        while (itr.hasNext()) { // Removes all non-active or immune Points
+            Point p = itr.next();
+            if (p.infected()) {
+                infected.add(p);
+            }
+            if (!p.alive() || p.immune()) {
+                itr.remove();
             }
         }
-    }
 
-    public void updateSimulationTest() {
-        List<Point> points = new LinkedList<>();
-        for (Point point : id) {
-            if (point.alive()) {
-                points.add(point);
-                System.out.println(point.toString());
-            }
+        set.reset(active);             // Resets the PointSet for all non-immune, active points
+        for (Point point : infected) { // Updates the list of nearest points for each infected point
+            point.infectious(set.nearest(point, point.distance()));
         }
-        set.reset(points);
+
         for (Point point : id) {
-            if (point.alive()) {
-                point.update(set.nearest(point, point.distance()));
-            }
+            point.move();
         }
+        numberOfUpdates += 1;
     }
 }

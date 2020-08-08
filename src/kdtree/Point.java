@@ -10,9 +10,9 @@ import java.util.Random;
  * A Point class represents an individual with (x,y) coordinates and information pertaining to infection.
  */
 public class Point {
-    private final int id;
-    private final int HEIGHT = 760;
-    private final int WIDTH = 1000;
+    private final int ID; // Each point will have an unique ID
+    private int height;
+    private int width;
     private int x;
     private int y;
 
@@ -21,9 +21,10 @@ public class Point {
     private boolean immune;
 
     private Disease disease;
-    private int daysSinceInfection = 0;
+    private static int dayCounter = 0;  // Global day tracker
+    private int dayInfected = 0;
     private boolean asymptomatic;
-    boolean immunocompromised; //4% mortality rate
+    boolean immunocompromised;
 
     Random rand = new Random();
 
@@ -32,19 +33,25 @@ public class Point {
     public Point(int id, int x, int y, String disease) { this(id, x, y, false, disease); }
 
     public Point(int id, int x, int y, boolean infected, String disease) {
-        this.id = id;
+        this.ID = id;
         this.x = x;
         this.y = y;
+        height = 500;
+        width = 500;
         this.infected = infected;
+
         try {
             this.disease = new Disease(disease, this);
         } catch (FileNotFoundException e) {
             System.out.println("Diseases.txt not found");
         }
-        immunocompromised = Math.random() <= 0.036; // Approximately 3.6% of the population is immunocompromised
+
+        if (!infected) {
+            immunocompromised = Math.random() <= 0.036; // Approximately 3.6% of the population is immunocompromised
+        }
     }
 
-    public int id() { return id; }
+    public int id() { return ID; }
 
     public int x() { return x; }
 
@@ -54,9 +61,16 @@ public class Point {
 
     public boolean infected() { return infected; }
 
-    public int daysSinceInfection() { return daysSinceInfection; }
+    public boolean immune() { return immune; }
+
+    public int dayCounter() { return dayCounter; }
+
+    public int dayInfected() { return dayInfected; }
+
+    public int daysSinceInfection() { return dayCounter - dayInfected; }
 
     public int distance() { return disease.distance(); }
+
 
     /**
      * Returns the distance between this Point and other Point.
@@ -67,32 +81,30 @@ public class Point {
         return Math.sqrt(distX + distY);
     }
 
+    public void move() {
+        if (alive) {
+            x = Math.min(width - 1, Math.max(0, x + rand.nextInt(21) - 10));
+            y = Math.min(height - 1, Math.max(0, y + rand.nextInt(21) - 10));
+        }
+    }
+
     /**
      * Point can only move 1 unit at a time from (0,0) to (x,y). An infected and symptomatic Point have a probability
      * to spread the disease with each update. After the infectious period is over, symptomatic Points can die according
      * to real-world statistics. Immunocompromised Points will always die after infection.
      */
-    public void update(List<Point> nearest) {
-        if (!alive) {
-            return;
+    public void infectious(List<Point> nearest) {
+        if (!asymptomatic) {
+            disease.spread(nearest);
         }
-        if (infected) {
-            if (!asymptomatic) {
-                disease.spread(nearest);
-            }
-            daysSinceInfection += 1;
-            if (daysSinceInfection > disease.recoveryDate()) {
-                daysSinceInfection = 0;
-                infected = false;
-                immune = true;
+        if (dayCounter - dayInfected > disease.recoveryDate()) {
+            infected = false;
+            immune = true;
 
-                if (immunocompromised || (!asymptomatic && Math.random() <= disease.mortality())) {
-                    alive = false;
-                }
+            if (immunocompromised || (!asymptomatic && Math.random() <= disease.mortality())) {
+                alive = false;
             }
         }
-        x = Math.min(WIDTH - 1, Math.max(0, x + rand.nextInt(11) - 5));
-        y = Math.min(HEIGHT - 1, Math.max(0, y + rand.nextInt(11) - 5));
     }
 
     /**
@@ -105,15 +117,23 @@ public class Point {
         }
         infected = true;
         immune = true;
+        dayInfected = dayCounter;
         if (!immunocompromised && Math.random() >= disease.contagious()) {
             asymptomatic = true;
         }
     }
 
+    /**
+     * BookKeeper will be manually responsible for updating the days
+     */
+    public void updateDay() {
+        dayCounter += 1;
+    }
+
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append(String.format("Point %d: (%d, %d)", id, x, y));
+        s.append(String.format("Point %d: (%d, %d)", ID, x, y));
         if (infected) {
             s.append(" infected");
         }
