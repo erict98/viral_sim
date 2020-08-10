@@ -1,6 +1,7 @@
 package kdtree;
 
 import diseases.Disease;
+import diseases.DiseaseFactory;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -10,9 +11,10 @@ import java.util.Random;
  * A Point class represents an individual with (x,y) coordinates and information pertaining to infection.
  */
 public class Point {
-    private final int ID; // Each point will have an unique ID
-    private int height;
-    private int width;
+    private final int id; // Each point will have an unique ID
+    private final int age;
+    private final int height;
+    private final int width;
     private int x;
     private int y;
 
@@ -33,25 +35,29 @@ public class Point {
     public Point(int id, int x, int y, String disease) { this(id, x, y, false, disease); }
 
     public Point(int id, int x, int y, boolean infected, String disease) {
-        this.ID = id;
-        this.x = x;
-        this.y = y;
         height = 500;
         width = 500;
-        this.infected = infected;
 
-        try {
-            this.disease = new Disease(disease, this);
-        } catch (FileNotFoundException e) {
-            System.out.println("Diseases.txt not found");
-        }
+        this.id = id;
+        this.age = rand.nextInt(100);
+        this.x = x;
+        this.y = y;
 
-        if (!infected) {
+        if (infected) {
+            this.infected = true;
+        } else {
             immunocompromised = Math.random() <= 0.036; // Approximately 3.6% of the population is immunocompromised
+        }
+        try {
+            this.disease = new DiseaseFactory(disease, this).getDisease();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
-    public int id() { return ID; }
+    public int id() { return id; }
+
+    public int age() { return age; }
 
     public int x() { return x; }
 
@@ -70,7 +76,6 @@ public class Point {
     public int daysSinceInfection() { return dayCounter - dayInfected; }
 
     public int distance() { return disease.distance(); }
-
 
     /**
      * Returns the distance between this Point and other Point.
@@ -133,7 +138,7 @@ public class Point {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append(String.format("Point %d: (%d, %d)", ID, x, y));
+        s.append(String.format("Point %d: (%d, %d)", id, x, y));
         if (infected) {
             s.append(" infected");
         }

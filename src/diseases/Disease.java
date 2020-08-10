@@ -18,7 +18,6 @@ public class Disease {
 
     double percentContagious; // Probability of showing symptoms
     double percentDeath;      // Probability of showing showing symptoms and dying
-    double probability = 1;   //TODO
 
     Point point;
 
@@ -26,7 +25,6 @@ public class Disease {
     Scanner scanner;
     Random rand = new Random();
 
-    //Catch potential errors?
     public Disease(String disease, Point point) throws FileNotFoundException {
         diseaseName = disease;
         this.point = point;
@@ -58,7 +56,6 @@ public class Disease {
                 break;
             }
         }
-        // catch diseases not found in file
     }
 
     public double contagious() { return percentContagious; }
@@ -70,13 +67,14 @@ public class Disease {
     public int recoveryDate() { return incubationRange + infectiousRange; }
 
     /**
+     * Default method for spreading diseases. Ignores all conditions besides immunity.
      * An infected and symptomatic point can spread the infection only during the infectious period or presymptomatic.
      */
     public void spread(List<Point> nearest) {
         if ((point.daysSinceInfection() >= incubationRange - presymptomatic) ||
                 (point.daysSinceInfection() <= incubationRange + infectiousRange)) {
             for (Point other : nearest) {
-                other.getInfected(probability);
+                other.getInfected(0.5);
             }
         }
     }

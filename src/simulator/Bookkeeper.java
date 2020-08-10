@@ -77,4 +77,33 @@ public class Bookkeeper {
         }
         numberOfUpdates += 1;
     }
+
+    public Point[] generateReport() {
+        Point[] arr = new Point[id.length];
+        int i = 0;
+        int j = 0; // Points to the last live point
+        int k = arr.length; // Points to the end of the array
+
+        while (j != k) {
+            Point p = arr[j];
+            if (!p.alive()) {
+                swap(arr, j, k - 1);
+                k--;
+            } else if (!p.immune()) {
+                i++;
+            } else { // if infected/immune
+                swap(arr, i, j);
+                i++;
+                j++;
+            }
+        }
+        return arr;
+    }
+
+    private void swap(Point[] arr, int a, int b) {
+        Point p = arr[a];
+        Point q = arr[b];
+        arr[a] = p;
+        arr[b] = q;
+    }
 }
