@@ -69,6 +69,8 @@ public class Point {
 
     public boolean immune() { return immune; }
 
+    public boolean symptomatic() { return !asymptomatic; }
+
     public int dayCounter() { return dayCounter; }
 
     public int dayInfected() { return dayInfected; }
@@ -133,6 +135,10 @@ public class Point {
      */
     public void updateDay() {
         dayCounter += 1;
+    }
+
+    public void resetDayCounter() {
+        dayCounter = 0;
     }
 
     @Override

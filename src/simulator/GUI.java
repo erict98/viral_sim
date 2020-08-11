@@ -9,6 +9,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class GUI extends Application {
@@ -19,8 +20,9 @@ public class GUI extends Application {
     private HBox configurations;
     private Animation animation;
     private final int MAX_COUNT = 300;
-    private final int MIN_COUNT = 50;
+    private final int MIN_COUNT = 100;
     private final int START_COUNT = 100;
+    private final String START_DISEASE = "TestDisease";
 
     public static void main(String[] args) { launch(args); }
 
@@ -33,7 +35,7 @@ public class GUI extends Application {
      * */
     @Override
     public void start(Stage stage) throws Exception {
-        animation = new Animation(START_COUNT, WIDTH, HEIGHT, "TestDisease");
+    animation = new Animation(START_COUNT, WIDTH, HEIGHT, START_DISEASE);
         this.window = stage;
 
         stage();
@@ -55,8 +57,8 @@ public class GUI extends Application {
         this.configurations = new HBox();
 
         ComboBox<String> cb = new ComboBox<String>();
-        cb.getItems().addAll("TestDisease", "COVID19");
-        cb.setValue("TestDisease");
+        cb.getItems().addAll("COVID19", "TestDisease"); // Ordering of options
+        cb.setValue(START_DISEASE);
 
         Button play = new Button("Play");
         Button pause = new Button("Pause");
@@ -70,7 +72,7 @@ public class GUI extends Application {
         });
 
         Slider slider = new Slider(MIN_COUNT, MAX_COUNT, START_COUNT);
-        slider.setMajorTickUnit(50.0);
+        slider.setMajorTickUnit(100.0);
         slider.setOrientation(Orientation.HORIZONTAL);
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
@@ -80,10 +82,14 @@ public class GUI extends Application {
     }
 
     public void setStage() {
-        Group g = animation.group();
         BorderPane pane = new BorderPane();
         pane.setTop(configurations);
-        pane.setCenter(g);
+
+        Pane p = new Pane();
+        for (Group g : animation.group()) {
+           p.getChildren().add(g);
+        }
+        pane.setCenter(p);
         window.setScene(new Scene(pane, WIDTH, HEIGHT));
     }
 

@@ -19,6 +19,7 @@ public class Bookkeeper {
     public  final String  diseaseName;
 
     private final List<Point> active;             // Keeps track of active points
+    private final List<Point> infected;           // Keeps track of all infected / immune points
     private final PointSet    set = new KDTree(); // Stores the location of the active point
     private int               numberOfUpdates;    // Number of updates that have occurred for this simulation
     private final int         nextDay = 6;        // Number of updates required for the next day to proceed
@@ -33,9 +34,11 @@ public class Bookkeeper {
         this.y = y;
         this.diseaseName = diseaseName;
         active = new LinkedList<>();
+        infected = new LinkedList<>();
 
         id = new Point[numberOfPoints];
         Point point = new Point(0, rand.nextInt(x), rand.nextInt(y), true, diseaseName);
+        point.resetDayCounter();
         id[0] = point;
         active.add(point);
         for (int i = 1; i < numberOfPoints; i++) {
@@ -47,6 +50,8 @@ public class Bookkeeper {
 
     public Point[] id() { return id; }
 
+    public List<Point> infected() { return infected; }
+
     /**
      * Updates the list of currently active points and their list of nearby points.
      */
@@ -55,7 +60,7 @@ public class Bookkeeper {
             id[0].updateDay();
         }
 
-        List<Point> infected = new LinkedList<>();
+        //List<Point> newlyInfected = new LinkedList<>();
         Iterator<Point> itr = active.iterator();
         while (itr.hasNext()) { // Removes all non-active or immune Points
             Point p = itr.next();
